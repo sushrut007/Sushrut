@@ -593,7 +593,7 @@ header .navbar ul li a:hover{
     width: 65%;
   }
   .bar .progress-line.python span{
-    width: 65%;
+    width: 75%;
   }
   .bar .progress-line.mysql span{
     width: 75%;
@@ -646,7 +646,7 @@ header .navbar ul li a:hover{
     content: "65%";
   }
   .progress-line.python span::after{
-    content: "65%";
+    content: "75%";
   }
   .progress-line.mysql span::after{
     content: "75%";
