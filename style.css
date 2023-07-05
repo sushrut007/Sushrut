@@ -918,7 +918,7 @@ header .navbar ul li a:hover{
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    z-index: -1;
+    z-index: 0;
   }
 .wrapper p span{
     color: var(--black);
