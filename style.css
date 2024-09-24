@@ -581,7 +581,7 @@ header .navbar ul li a:hover{
     animation: animate 1s 1s cubic-bezier(1,0,0.5,1) forwards;
   }
   .bar .progress-line.html span{
-    width: 75%;
+    width: 85%;
   }
   .bar .progress-line.java span{
     width: 90%;
@@ -593,16 +593,16 @@ header .navbar ul li a:hover{
     width: 65%;
   }
   .bar .progress-line.python span{
-    width: 75%;
+    width: 85%;
   }
   .bar .progress-line.mysql span{
     width: 75%;
   }
   .bar .progress-line.html span{
-    width: 80%;
+    width: 90%;
   }
   .bar .progress-line.JavaScript span{
-    width: 60%;
+    width: 65%;
   }
   .progress-line span::before{
     position: absolute;
@@ -646,16 +646,16 @@ header .navbar ul li a:hover{
     content: "65%";
   }
   .progress-line.python span::after{
-    content: "75%";
+    content: "85%";
   }
   .progress-line.mysql span::after{
     content: "75%";
   }
   .progress-line.html span::after{
-    content: "80%";
+    content: "90%";
   }
   .progress-line.JavaScript span::after{
-    content: "60%";
+    content: "65%";
   }
 
 
