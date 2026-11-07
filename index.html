@@ -254,19 +254,15 @@
        ========================================================================== */
     #desktop-icons {
       position: absolute;
-      top: 16px;
-      left: 16px;
-      bottom: 16px;
-      display: flex;
-      flex-direction: column;
-      flex-wrap: wrap;
-      align-content: flex-start;
-      gap: 12px;
-      z-index: 2;
-      pointer-events: auto;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 20;
     }
 
     .desktop-icon {
+      position: absolute;
       width: 86px;
       height: 94px;
       display: flex;
@@ -276,10 +272,22 @@
       padding: 6px 4px;
       border-radius: var(--radius-sm);
       border: 1px solid transparent;
-      transition: all 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
       cursor: pointer;
       text-align: center;
-      position: relative;
+      pointer-events: auto;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .desktop-icon.is-dragging {
+      z-index: 1000 !important;
+      opacity: 0.94 !important;
+      cursor: grabbing !important;
+      transition: none !important;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 0 1.5px rgba(0, 120, 212, 0.7) !important;
+      background: rgba(0, 120, 212, 0.22) !important;
+      backdrop-filter: blur(8px) !important;
     }
 
     .desktop-icon:hover {
@@ -1819,7 +1827,7 @@
        ========================================================================== */
     #start-menu {
       position: absolute;
-      bottom: calc(var(--taskbar-h) + 12px);
+      bottom: 10px;
       left: 50%;
       transform: translateX(-50%) translateY(24px) scale(0.96);
       width: 620px;
@@ -2157,7 +2165,7 @@
        ========================================================================== */
     #calendar-flyout {
       position: absolute;
-      bottom: calc(var(--taskbar-h) + 12px);
+      bottom: 10px;
       right: 12px;
       width: 330px;
       background: rgba(20, 26, 44, 0.92);
@@ -2897,19 +2905,13 @@
       .cube-3d-scene .cube-bottom { transform: rotateX(-90deg) translateZ(43px) !important; }
 
       #desktop-icons {
-        position: absolute;
-        top: 14px;
-        left: 8px;
-        right: 8px;
-        bottom: 10px;
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        grid-auto-rows: 82px;
-        gap: 8px;
-        padding: 4px;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        pointer-events: none !important;
+        overflow: visible !important;
       }
 
       #desktop-icons::-webkit-scrollbar {
@@ -2917,8 +2919,11 @@
       }
 
       .desktop-icon {
-        width: 100%;
-        height: 78px;
+        position: absolute !important;
+        width: 78px !important;
+        height: 80px !important;
+        pointer-events: auto !important;
+        touch-action: none !important;
         border-radius: var(--radius-md) !important;
         background: rgba(255, 255, 255, 0.05) !important;
         border: 1px solid rgba(255, 255, 255, 0.07) !important;
@@ -4326,7 +4331,7 @@
       </div>
 
       <!-- 9. Resume PDF Direct Link -->
-      <div class="desktop-icon" onclick="window.open('Sushrut_Mhetras_Resume.pdf', '_blank')" tabindex="0">
+      <div class="desktop-icon" data-app="win-resume-pdf" onclick="if (DesktopIconManager && DesktopIconManager.justDragged) return; window.open('Sushrut_Mhetras_Resume.pdf', '_blank')" tabindex="0">
         <div class="desktop-icon-img"><svg class="win-app-svg"><use href="#app-pdf"/></svg></div>
         <span class="desktop-icon-label">Resume.pdf</span>
       </div>
@@ -5357,6 +5362,9 @@
       <div class="context-item" onclick="desktopAction('refresh')">
         <i class="fa-solid fa-arrows-rotate"></i> Refresh Desktop
       </div>
+      <div class="context-item" onclick="desktopAction('auto-arrange')">
+        <i class="fa-solid fa-table-cells"></i> Auto Arrange Icons
+      </div>
       <div class="context-item" onclick="openWindow('win-about')">
         <i class="fa-solid fa-user"></i> View Profile (About Me)
       </div>
@@ -5944,26 +5952,39 @@
         document.querySelectorAll('.desktop-icon[data-app]').forEach((icon) => {
           const appId = icon.getAttribute('data-app');
           icon.addEventListener('click', (e) => {
+            if (typeof DesktopIconManager !== 'undefined' && DesktopIconManager.justDragged) {
+              return;
+            }
             document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
             icon.classList.add('selected');
             // Single tap on mobile opens the application directly
-            if (window.innerWidth <= 768) {
+            if (window.innerWidth <= 768 && appId !== 'win-resume-pdf') {
               this.open(appId);
             }
           });
 
           // Double click for desktop
           icon.addEventListener('dblclick', () => {
-            this.open(appId);
+            if (typeof DesktopIconManager !== 'undefined' && DesktopIconManager.justDragged) {
+              return;
+            }
+            if (appId !== 'win-resume-pdf') {
+              this.open(appId);
+            }
           });
 
           // Touch support for mobile/tablets
           let lastTap = 0;
           icon.addEventListener('touchend', (e) => {
+            if (typeof DesktopIconManager !== 'undefined' && DesktopIconManager.justDragged) {
+              return;
+            }
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
             if (tapLength < 400 && tapLength > 0) {
-              this.open(appId);
+              if (appId !== 'win-resume-pdf') {
+                this.open(appId);
+              }
               e.preventDefault();
             }
             lastTap = currentTime;
@@ -6463,6 +6484,303 @@
     }
 
     /* ==========================================================================
+       2.5. WINDOWS 11 DRAGGABLE DESKTOP ICONS & GRID SYSTEM
+       ========================================================================== */
+    const DesktopIconManager = {
+      positions: { desktop: {}, mobile: {} },
+      isDragging: false,
+      draggedEl: null,
+      justDragged: false,
+
+      init() {
+        this.loadPositions();
+        this.applyPositions();
+        this.setupDraggable();
+
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(() => {
+            this.applyPositions();
+          }, 100);
+        });
+      },
+
+      loadPositions() {
+        try {
+          const saved = localStorage.getItem('win11_desktop_icon_positions');
+          if (saved) {
+            this.positions = JSON.parse(saved);
+          }
+        } catch (e) {
+          this.positions = { desktop: {}, mobile: {} };
+        }
+      },
+
+      savePositions() {
+        try {
+          localStorage.setItem('win11_desktop_icon_positions', JSON.stringify(this.positions));
+        } catch (e) {}
+      },
+
+      isMobile() {
+        return window.innerWidth <= 768;
+      },
+
+      getDefaultPositions() {
+        const isMobile = this.isMobile();
+        const icons = Array.from(document.querySelectorAll('.desktop-icon'));
+        const screenW = window.innerWidth;
+        const taskbarH = isMobile ? 68 : 48;
+        const screenH = window.innerHeight - taskbarH;
+        const result = {};
+
+        if (isMobile) {
+          const cols = 4;
+          const colW = Math.floor((screenW - 16) / cols);
+          const rowH = 84;
+          icons.forEach((icon, i) => {
+            const id = icon.getAttribute('data-app') || 'win-app-' + i;
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            result[id] = {
+              x: Math.round(8 + col * colW + Math.max(0, (colW - 78) / 2)),
+              y: Math.round(12 + row * rowH)
+            };
+          });
+        } else {
+          const startX = 16;
+          const startY = 16;
+          const cellW = 96;
+          const cellH = 104;
+          const maxRows = Math.max(1, Math.floor((screenH - 32) / cellH));
+          icons.forEach((icon, i) => {
+            const id = icon.getAttribute('data-app') || 'win-app-' + i;
+            const col = Math.floor(i / maxRows);
+            const row = i % maxRows;
+            result[id] = {
+              x: startX + col * cellW,
+              y: startY + row * cellH
+            };
+          });
+        }
+        return result;
+      },
+
+      applyPositions() {
+        const isMobile = this.isMobile();
+        const mode = isMobile ? 'mobile' : 'desktop';
+        const defaults = this.getDefaultPositions();
+        const modePositions = this.positions[mode] || {};
+
+        const icons = document.querySelectorAll('.desktop-icon');
+        icons.forEach((icon) => {
+          const id = icon.getAttribute('data-app') || 'win-resume-pdf';
+          const pos = modePositions[id] || defaults[id];
+          if (pos) {
+            icon.style.left = pos.x + 'px';
+            icon.style.top = pos.y + 'px';
+          }
+        });
+      },
+
+      snapToGrid(targetX, targetY, currentId) {
+        const isMobile = this.isMobile();
+        const mode = isMobile ? 'mobile' : 'desktop';
+        const screenW = window.innerWidth;
+        const taskbarH = isMobile ? 68 : 48;
+        const screenH = window.innerHeight - taskbarH;
+        const iconW = isMobile ? 78 : 86;
+        const iconH = isMobile ? 80 : 94;
+
+        const cellW = isMobile ? Math.floor((screenW - 16) / 4) : 96;
+        const cellH = isMobile ? 84 : 104;
+        const startX = isMobile ? 8 : 16;
+        const startY = isMobile ? 12 : 16;
+
+        let col = Math.max(0, Math.round((targetX - startX) / cellW));
+        let row = Math.max(0, Math.round((targetY - startY) / cellH));
+
+        if (isMobile) {
+          col = Math.min(3, col);
+        }
+
+        const currentPositions = this.positions[mode] || {};
+
+        function isOccupied(c, r) {
+          const testX = startX + c * cellW;
+          const testY = startY + r * cellH;
+          for (const [id, p] of Object.entries(currentPositions)) {
+            if (id === currentId) continue;
+            if (Math.abs(p.x - testX) < 25 && Math.abs(p.y - testY) < 25) {
+              return true;
+            }
+          }
+          return false;
+        }
+
+        while (isOccupied(col, row)) {
+          row++;
+          if (!isMobile && startY + row * cellH > screenH - cellH) {
+            row = 0;
+            col++;
+          }
+        }
+
+        const clampedX = Math.min(screenW - iconW - 8, Math.max(8, startX + col * cellW));
+        const clampedY = Math.min(screenH - iconH - 8, Math.max(8, startY + row * cellH));
+
+        return { x: clampedX, y: clampedY };
+      },
+
+      autoArrange() {
+        const isMobile = this.isMobile();
+        const mode = isMobile ? 'mobile' : 'desktop';
+        const defaults = this.getDefaultPositions();
+        this.positions[mode] = { ...defaults };
+        this.savePositions();
+
+        const icons = document.querySelectorAll('.desktop-icon');
+        icons.forEach((icon, i) => {
+          const id = icon.getAttribute('data-app') || 'win-resume-pdf';
+          const pos = defaults[id];
+          if (pos) {
+            icon.style.transition = `left 0.28s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.025}s, top 0.28s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.025}s`;
+            icon.style.left = pos.x + 'px';
+            icon.style.top = pos.y + 'px';
+          }
+        });
+
+        setTimeout(() => {
+          icons.forEach(icon => {
+            icon.style.transition = '';
+          });
+        }, 500);
+
+        showToast('Desktop', 'Icons aligned to desktop grid.');
+      },
+
+      setupDraggable() {
+        const icons = document.querySelectorAll('.desktop-icon');
+
+        icons.forEach((icon) => {
+          let startX = 0, startY = 0;
+          let initialLeft = 0, initialTop = 0;
+          let isDraggingThis = false;
+
+          const onPointerDown = (clientX, clientY) => {
+            startX = clientX;
+            startY = clientY;
+            initialLeft = parseInt(icon.style.left, 10) || icon.offsetLeft;
+            initialTop = parseInt(icon.style.top, 10) || icon.offsetTop;
+            isDraggingThis = false;
+          };
+
+          const onPointerMove = (clientX, clientY) => {
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+
+            if (!isDraggingThis && Math.hypot(dx, dy) > 6) {
+              isDraggingThis = true;
+              this.isDragging = true;
+              this.draggedEl = icon;
+              icon.classList.add('is-dragging');
+              icon.style.transition = 'none';
+            }
+
+            if (isDraggingThis) {
+              const isMobile = this.isMobile();
+              const screenW = window.innerWidth;
+              const taskbarH = isMobile ? 68 : 48;
+              const screenH = window.innerHeight - taskbarH;
+              const iconW = icon.offsetWidth || (isMobile ? 78 : 86);
+              const iconH = icon.offsetHeight || (isMobile ? 80 : 94);
+
+              const newX = Math.max(4, Math.min(screenW - iconW - 4, initialLeft + dx));
+              const newY = Math.max(4, Math.min(screenH - iconH - 4, initialTop + dy));
+
+              icon.style.left = newX + 'px';
+              icon.style.top = newY + 'px';
+            }
+          };
+
+          const onPointerUp = () => {
+            if (isDraggingThis) {
+              isDraggingThis = false;
+              this.isDragging = false;
+              this.draggedEl = null;
+              icon.classList.remove('is-dragging');
+
+              this.justDragged = true;
+              setTimeout(() => { this.justDragged = false; }, 200);
+
+              const currentX = parseInt(icon.style.left, 10) || initialLeft;
+              const currentY = parseInt(icon.style.top, 10) || initialTop;
+              const appId = icon.getAttribute('data-app') || 'win-resume-pdf';
+
+              const snapped = this.snapToGrid(currentX, currentY, appId);
+
+              icon.style.transition = 'left 0.22s cubic-bezier(0.16, 1, 0.3, 1), top 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+              icon.style.left = snapped.x + 'px';
+              icon.style.top = snapped.y + 'px';
+
+              setTimeout(() => {
+                icon.style.transition = '';
+              }, 250);
+
+              const mode = this.isMobile() ? 'mobile' : 'desktop';
+              if (!this.positions[mode]) this.positions[mode] = {};
+              this.positions[mode][appId] = { x: snapped.x, y: snapped.y };
+              this.savePositions();
+            }
+          };
+
+          // Mouse Dragging
+          icon.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return;
+            onPointerDown(e.clientX, e.clientY);
+
+            const moveHandler = (ev) => onPointerMove(ev.clientX, ev.clientY);
+            const upHandler = () => {
+              window.removeEventListener('mousemove', moveHandler);
+              window.removeEventListener('mouseup', upHandler);
+              onPointerUp();
+            };
+
+            window.addEventListener('mousemove', moveHandler);
+            window.addEventListener('mouseup', upHandler);
+          });
+
+          // Touch Dragging for mobile / tablets
+          icon.addEventListener('touchstart', (e) => {
+            if (!e.touches || !e.touches[0]) return;
+            onPointerDown(e.touches[0].clientX, e.touches[0].clientY);
+          }, { passive: true });
+
+          icon.addEventListener('touchmove', (e) => {
+            if (!e.touches || !e.touches[0]) return;
+            onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+            if (isDraggingThis) {
+              e.preventDefault();
+            }
+          }, { passive: false });
+
+          icon.addEventListener('touchend', () => {
+            onPointerUp();
+          }, { passive: true });
+
+          // Prevent opening if dragged
+          icon.addEventListener('click', (e) => {
+            if (this.justDragged) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }, true);
+        });
+      }
+    };
+
+    /* ==========================================================================
        3. DESKTOP CONTEXT MENU & MARQUEE SELECTION
        ========================================================================== */
     const contextMenu = document.getElementById('context-menu');
@@ -6499,6 +6817,10 @@
         desktop.style.opacity = '0.7';
         setTimeout(() => { desktop.style.opacity = '1'; }, 180);
         showToast('Desktop Refreshed', 'Refreshed active explorer cache.');
+      } else if (action === 'auto-arrange') {
+        if (typeof DesktopIconManager !== 'undefined') {
+          DesktopIconManager.autoArrange();
+        }
       } else if (action === 'lock') {
         triggerLock();
       } else if (action === 'power') {
@@ -7505,6 +7827,7 @@ LinkedIn: https://www.linkedin.com/in/sushrut-mhetras-a31774238/
       }
 
       WindowManager.init();
+      DesktopIconManager.init();
 
       const powerState = sessionStorage.getItem('win11_power_state');
       const sessionState = sessionStorage.getItem('win11_session_state');
