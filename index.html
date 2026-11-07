@@ -36,8 +36,8 @@
       --bg-aurora-1: #0d0f1f;
       --bg-aurora-2: #13112e;
       --bg-aurora-3: #0a0d1e;
-      --win-glass: rgba(32, 32, 42, 0.82);
-      --win-glass-active: rgba(36, 36, 52, 0.92);
+      --win-glass: #1f2230;
+      --win-glass-active: #232738;
       --win-glass-border: rgba(255, 255, 255, 0.10);
       --win-glass-active-border: rgba(0, 120, 212, 0.55);
       --taskbar-bg: rgba(24, 24, 32, 0.86);
@@ -118,16 +118,26 @@
       width: 100vw;
       height: calc(100vh - var(--taskbar-h));
       overflow: hidden;
-      /* Authentic Windows 11 Signature Dark Bloom recreation */
-      background-color: #080914;
-      background-image:
-        radial-gradient(ellipse 42% 52% at 54% 48%, rgba(0, 120, 240, 0.62) 0%, transparent 68%),
-        radial-gradient(ellipse 46% 40% at 47% 53%, rgba(138, 43, 226, 0.52) 0%, transparent 68%),
-        radial-gradient(ellipse 30% 40% at 62% 42%, rgba(0, 212, 255, 0.42) 0%, transparent 60%),
-        radial-gradient(ellipse 48% 46% at 40% 47%, rgba(219, 39, 119, 0.34) 0%, transparent 65%),
-        radial-gradient(ellipse 78% 68% at 52% 50%, rgba(20, 30, 95, 0.65) 0%, transparent 78%),
-        radial-gradient(circle at 50% 50%, #0c0f24 0%, #06070f 100%);
-      background-attachment: fixed;
+      z-index: 10;
+      background-color: transparent;
+    }
+
+    /* Authentic Windows 11 4K Bloom Wallpaper */
+    .desktop-wallpaper {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      background-color: #020818;
+      background-image: url('assets/wallpaper-win11-dark.jpg');
+      background-position: center center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      transition: filter 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: scale(1);
+      will-change: filter, transform;
     }
 
     #wallpaper-canvas {
@@ -141,12 +151,7 @@
     }
 
     .aurora-glow {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(100px);
-      pointer-events: none;
-      z-index: 2;
-      animation: auroraFloat 20s ease-in-out infinite alternate;
+      display: none !important;
     }
     .aurora-1 {
       top: -15%;
@@ -257,7 +262,7 @@
       flex-wrap: wrap;
       align-content: flex-start;
       gap: 12px;
-      z-index: 10;
+      z-index: 2;
       pointer-events: auto;
     }
 
@@ -409,35 +414,52 @@
       z-index: 20;
     }
 
-        /* Desktop Window Acrylic Backdrop Blur */
+    /* Windows standard behavior: Background is completely visible when windows are open */
     .desktop-window-backdrop {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100%;
-      background: rgba(4, 6, 14, 0.42);
-      backdrop-filter: blur(14px) saturate(140%);
-      -webkit-backdrop-filter: blur(14px) saturate(140%);
-      z-index: 40;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: none !important;
+      pointer-events: none !important;
     }
 
     body.has-open-window .desktop-window-backdrop {
-      opacity: 1;
-      pointer-events: auto;
+      display: none !important;
+      pointer-events: none !important;
+    }
+
+    /* Desktop wallpaper and icons remain crisp and fully visible when windows are open */
+    body.has-open-window .desktop-wallpaper,
+    body.theme-light.has-open-window .desktop-wallpaper {
+      filter: none !important;
+      transform: none !important;
     }
 
     body.has-open-window #wallpaper-canvas {
-      filter: blur(12px) brightness(0.65);
-      transition: filter 0.35s ease;
+      filter: none !important;
     }
 
     body.has-open-window #desktop-icons {
-      filter: blur(6px) brightness(0.70);
-      transition: filter 0.35s ease;
+      filter: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+      pointer-events: auto !important;
+    }
+
+    body.has-open-window .cube-3d-scene {
+      filter: none !important;
+      opacity: 0.85 !important;
+    }
+
+    /* Clean inactive window state matching Windows 11 */
+    .os-window.open:not(.active) {
+      opacity: 0.96;
+      filter: none !important;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45) !important;
+      transition: opacity 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .os-window.open.active {
+      opacity: 1 !important;
+      filter: none !important;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85), 0 0 1px rgba(96, 205, 255, 0.7) !important;
     }
 
     .os-window {
@@ -445,9 +467,9 @@
       display: flex;
       flex-direction: column;
       border-radius: var(--radius-md);
-      background: var(--win-glass);
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      background: #1f2230 !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
       border: 1px solid var(--win-glass-border);
       box-shadow: var(--shadow-window);
       pointer-events: auto;
@@ -2172,6 +2194,33 @@
       font-weight: 500;
     }
 
+    .calendar-header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .calendar-close-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      color: var(--text-secondary);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .calendar-close-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+    }
+
     .quick-toggles-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -2185,21 +2234,500 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 10px 4px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: var(--radius-sm);
+      padding: 12px 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: var(--radius-md);
       color: var(--text-secondary);
       font-size: 11px;
-      gap: 6px;
+      font-weight: 500;
+      gap: 8px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.18s ease;
+      user-select: none;
+    }
+
+    .quick-toggle-btn i {
+      font-size: 17px;
+    }
+
+    .quick-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.10);
+      color: var(--text-primary);
     }
 
     .quick-toggle-btn.active {
-      background: #0078d4;
-      border-color: rgba(255, 255, 255, 0.3);
-      color: #ffffff;
+      background: #0078d4 !important;
+      border-color: rgba(255, 255, 255, 0.35) !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 14px rgba(0, 120, 212, 0.4);
+    }
+
+    .quick-toggle-btn.active:hover {
+      background: #006abc !important;
+      color: #ffffff !important;
+    }
+
+    .quick-brightness-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .win-slider {
+      flex: 1;
+      height: 5px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.2);
+      outline: none;
+      -webkit-appearance: none;
+      accent-color: #0078d4;
+      cursor: pointer;
+    }
+
+    .win-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid #0078d4;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    /* ==========================================================================
+       WINDOWS 11 LIGHT MODE THEME
+       ========================================================================== */
+    body.theme-light {
+      --bg-dark: #f0f4f9;
+      --bg-card: rgba(255, 255, 255, 0.85);
+      --win-glass: rgba(245, 248, 254, 0.94);
+      --win-glass-active: rgba(255, 255, 255, 0.98);
+      --win-glass-border: rgba(0, 0, 0, 0.12);
+      --win-glass-active-border: rgba(0, 120, 212, 0.75);
+      --accent-neon: #0078d4;
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --taskbar-glass: rgba(240, 244, 250, 0.94);
+      --taskbar-border: rgba(0, 0, 0, 0.08);
+      --start-glass: rgba(248, 250, 254, 0.96);
+      --shadow-window: 0 24px 60px rgba(0, 0, 0, 0.16), 0 0 1px rgba(0, 0, 0, 0.2);
+    }
+
+    body.theme-light #desktop {
+      background-color: transparent !important;
+      background-image: none !important;
+    }
+
+    body.theme-light .desktop-wallpaper {
+      background-color: #f0f4f8 !important;
+      background-image: url('assets/wallpaper-win11-light.jpg') !important;
+    }
+
+    body.theme-light .win11-lock-screen {
+      background-color: #f0f4f8 !important;
+      background-image: url('assets/wallpaper-win11-light.jpg') !important;
+    }
+
+    body.theme-light .os-window {
+      background: #ffffff !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border-color: rgba(0, 0, 0, 0.12) !important;
+      color: #0f172a !important;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    body.theme-light .os-window.active {
+      background: #ffffff !important;
+      border-color: rgba(0, 120, 212, 0.6) !important;
+      box-shadow: 0 24px 60px rgba(0, 120, 212, 0.18), 0 0 1px rgba(0, 120, 212, 0.4) !important;
+    }
+
+    body.theme-light .window-titlebar {
+      background: #f3f5f8 !important;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+      color: #0f172a !important;
+    }
+
+    body.theme-light .window-content {
+      background: #ffffff !important;
+    }
+
+    body.theme-light .window-title-group {
+      color: #0f172a !important;
+    }
+
+    body.theme-light .window-controls .btn-min,
+    body.theme-light .window-controls .btn-max,
+    body.theme-light .window-controls .btn-close {
+      color: #334155 !important;
+      border-left-color: rgba(0, 0, 0, 0.08) !important;
+    }
+
+    body.theme-light .window-content {
+      background: #f8fafc !important;
+      color: #0f172a !important;
+    }
+
+    body.theme-light .about-name {
+      color: #0f172a !important;
+    }
+
+    body.theme-light .skill-category,
+    body.theme-light .exp-card,
+    body.theme-light .project-card,
+    body.theme-light .cert-card,
+    body.theme-light .edu-timeline-item,
+    body.theme-light .stat-card,
+    body.theme-light .contact-card-block,
+    body.theme-light .about-summary-card,
+    body.theme-light .contact-card {
+      background: #ffffff !important;
+      border-color: rgba(0, 0, 0, 0.10) !important;
+      color: #0f172a !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+    }
+
+    body.theme-light .project-title,
+    body.theme-light .exp-title,
+    body.theme-light .cert-title,
+    body.theme-light .edu-degree {
+      color: #0f172a !important;
+    }
+
+    body.theme-light .project-desc,
+    body.theme-light .exp-desc,
+    body.theme-light .cert-skills,
+    body.theme-light .edu-desc {
+      color: #334155 !important;
+    }
+
+    body.theme-light #taskbar {
+      background: rgba(240, 244, 252, 0.94) !important;
+      border-top-color: rgba(0, 0, 0, 0.10) !important;
+      box-shadow: 0 -2px 14px rgba(0, 0, 0, 0.10) !important;
+    }
+
+    body.theme-light #live-time {
+      color: #0f172a !important;
+    }
+
+    body.theme-light #live-date {
+      color: #64748b !important;
+    }
+
+    body.theme-light .desktop-icon-name {
+      color: #0f172a !important;
+      text-shadow: 0 1px 4px rgba(255, 255, 255, 0.8) !important;
+    }
+
+    body.theme-light #start-menu,
+    body.theme-light #calendar-flyout {
+      background: rgba(248, 250, 254, 0.96) !important;
+      border-color: rgba(0, 0, 0, 0.14) !important;
+      color: #0f172a !important;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18) !important;
+    }
+
+    body.theme-light .start-tile {
+      background: rgba(0, 0, 0, 0.04) !important;
+      border-color: rgba(0, 0, 0, 0.06) !important;
+    }
+
+    body.theme-light .start-tile-label {
+      color: #0f172a !important;
+    }
+
+    body.theme-light .calendar-clock-big {
+      color: #0f172a !important;
+    }
+
+    body.theme-light .desktop-window-backdrop {
+      background: rgba(230, 238, 248, 0.65) !important;
+    }
+
+    /* Quick Settings Buttons in Light Mode */
+    body.theme-light .quick-toggle-btn {
+      background: rgba(0, 0, 0, 0.05) !important;
+      border: 1px solid rgba(0, 0, 0, 0.10) !important;
+      color: #334155 !important;
+      box-shadow: none !important;
+    }
+
+    body.theme-light .quick-toggle-btn:hover {
+      background: rgba(0, 0, 0, 0.09) !important;
+      color: #0f172a !important;
+    }
+
+    body.theme-light .quick-toggle-btn.active {
+      background: #0078d4 !important;
+      border-color: rgba(0, 120, 212, 0.8) !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 14px rgba(0, 120, 212, 0.35) !important;
+    }
+
+    body.theme-light .quick-toggle-btn.active:hover {
+      background: #006abc !important;
+      color: #ffffff !important;
+    }
+
+    body.theme-light .calendar-close-btn {
+      background: rgba(0, 0, 0, 0.05) !important;
+      border-color: rgba(0, 0, 0, 0.10) !important;
+      color: #64748b !important;
+    }
+
+    body.theme-light .calendar-close-btn:hover {
+      background: rgba(0, 0, 0, 0.10) !important;
+      color: #0f172a !important;
+    }
+
+    body.theme-light .win-slider {
+      background: rgba(0, 0, 0, 0.15) !important;
+    }
+
+    /* Proper Hover States for all Components in Light Mode */
+    body.theme-light .desktop-icon:hover {
+      background: rgba(0, 0, 0, 0.06) !important;
+      border-color: rgba(0, 0, 0, 0.12) !important;
+    }
+
+    body.theme-light .desktop-icon.selected {
+      background: rgba(0, 120, 212, 0.14) !important;
+      border-color: rgba(0, 120, 212, 0.45) !important;
+    }
+
+    body.theme-light .taskbar-btn:hover {
+      background: rgba(0, 0, 0, 0.06) !important;
+    }
+
+    body.theme-light .taskbar-btn.is-active {
+      background: rgba(0, 120, 212, 0.16) !important;
+      border: 1px solid rgba(0, 120, 212, 0.35) !important;
+    }
+
+    body.theme-light #start-btn:hover {
+      background: rgba(0, 120, 212, 0.18) !important;
+      border-color: rgba(0, 120, 212, 0.45) !important;
+    }
+
+    body.theme-light .tray-item:hover,
+    body.theme-light .tray-clock-item:hover {
+      background: rgba(0, 0, 0, 0.06) !important;
+      border-color: rgba(0, 0, 0, 0.12) !important;
+    }
+
+    body.theme-light .win-btn:hover {
+      background: rgba(0, 0, 0, 0.07) !important;
+      color: #0f172a !important;
+    }
+
+    body.theme-light .win-btn.btn-close:hover {
+      background: #c42b1c !important;
+      color: #ffffff !important;
+    }
+
+    body.theme-light .start-tile:hover {
+      background: rgba(0, 0, 0, 0.06) !important;
+      border-color: rgba(0, 0, 0, 0.12) !important;
+    }
+
+    body.theme-light .start-all-apps-btn:hover {
+      background: rgba(0, 120, 212, 0.12) !important;
+      border-color: rgba(0, 120, 212, 0.35) !important;
+      color: #0078d4 !important;
+    }
+
+    body.theme-light .all-app-row:hover {
+      background: rgba(0, 0, 0, 0.05) !important;
+    }
+
+    body.theme-light .start-power-btn:hover {
+      background: rgba(0, 0, 0, 0.08) !important;
+      color: #0f172a !important;
+    }
+
+    body.theme-light .skill-category:hover,
+    body.theme-light .exp-card:hover,
+    body.theme-light .project-card:hover,
+    body.theme-light .cert-card:hover,
+    body.theme-light .stat-card:hover {
+      border-color: rgba(0, 120, 212, 0.45) !important;
+      box-shadow: 0 8px 24px rgba(0, 120, 212, 0.12) !important;
+    }
+
+    body.theme-light .chip-item {
+      background: rgba(0, 0, 0, 0.04) !important;
+      border-color: rgba(0, 0, 0, 0.09) !important;
+      color: #334155 !important;
+    }
+
+    body.theme-light .chip-item:hover {
+      background: rgba(0, 120, 212, 0.10) !important;
+      border-color: rgba(0, 120, 212, 0.35) !important;
+      color: #0078d4 !important;
+    }
+
+    body.theme-light .cert-btn {
+      background: rgba(0, 120, 212, 0.08) !important;
+      border-color: rgba(0, 120, 212, 0.25) !important;
+      color: #0078d4 !important;
+    }
+
+    body.theme-light .cert-btn:hover {
+      background: #0078d4 !important;
+      color: #ffffff !important;
+    }
+
+    body.theme-light .social-btn {
+      background: rgba(0, 0, 0, 0.04) !important;
+      border-color: rgba(0, 0, 0, 0.10) !important;
+      color: #334155 !important;
+    }
+
+    body.theme-light .social-btn:hover {
+      background: rgba(0, 120, 212, 0.10) !important;
+      border-color: rgba(0, 120, 212, 0.3) !important;
+      color: #0078d4 !important;
+    }
+
+    body.theme-light .resume-cta-btn {
+      background: #0078d4 !important;
+      color: #ffffff !important;
+    }
+
+    body.theme-light .resume-cta-btn:hover {
+      background: #006abc !important;
+    }
+
+    body.theme-light .win-input,
+    body.theme-light .win-textarea {
+      background: #ffffff !important;
+      border-color: rgba(0, 0, 0, 0.18) !important;
+      color: #0f172a !important;
+    }
+
+    body.theme-light .win-input:focus,
+    body.theme-light .win-textarea:focus {
+      border-color: #0078d4 !important;
+      box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2) !important;
+    }
+
+    /* Windows 11 Light Mode Start Menu, Search, Flyouts & Menus */
+    body.theme-light .start-search-input {
+      background: #ffffff !important;
+      border: 1px solid rgba(0, 0, 0, 0.16) !important;
+      border-bottom: 2px solid #0078d4 !important;
+      color: #0f172a !important;
+    }
+
+    body.theme-light .start-search-input:focus {
+      background: #ffffff !important;
+      box-shadow: 0 0 10px rgba(0, 120, 212, 0.25) !important;
+    }
+
+    body.theme-light .start-footer {
+      background: rgba(238, 243, 250, 0.96) !important;
+      border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+    }
+
+    body.theme-light .start-user-name {
+      color: #0f172a !important;
+    }
+
+    body.theme-light .start-user-info:hover {
+      background: rgba(0, 0, 0, 0.06) !important;
+    }
+
+    body.theme-light #start-power-flyout {
+      background: rgba(248, 250, 254, 0.98) !important;
+      border: 1px solid rgba(0, 0, 0, 0.12) !important;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    body.theme-light .power-flyout-item {
+      color: #0f172a !important;
+    }
+
+    body.theme-light .power-flyout-item:hover {
+      background: rgba(0, 0, 0, 0.06) !important;
+    }
+
+    body.theme-light #context-menu {
+      background: rgba(248, 250, 254, 0.96) !important;
+      border: 1px solid rgba(0, 0, 0, 0.12) !important;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16) !important;
+    }
+
+    body.theme-light .context-item {
+      color: #334155 !important;
+    }
+
+    body.theme-light .context-item:hover {
+      background: rgba(0, 120, 212, 0.12) !important;
+      color: #0078d4 !important;
+    }
+
+    body.theme-light .context-divider {
+      background: rgba(0, 0, 0, 0.08) !important;
+    }
+
+    body.theme-light .project-link-btn {
+      color: #0078d4 !important;
+    }
+
+    body.theme-light .project-link-btn:hover {
+      color: #005a9e !important;
+      transform: translateX(4px);
+    }
+
+    body.theme-light .taskbar-widget-btn:hover {
+      background: rgba(0, 0, 0, 0.06) !important;
+      color: #0f172a !important;
+    }
+
+    body.theme-light .calendar-date-big {
+      color: #0078d4 !important;
+    }
+
+    body.theme-light .quick-brightness-row {
+      border-top-color: rgba(0, 0, 0, 0.08) !important;
+    }
+
+    body.theme-light .quick-toggles-grid {
+      border-top-color: rgba(0, 0, 0, 0.08) !important;
+    }
+
+    /* 3D Interactive Prism Cube in Light Theme - Crisp & High Contrast */
+    body.theme-light .cube-3d-scene {
+      opacity: 0.95 !important;
+    }
+
+    body.theme-light .cube-face {
+      background: rgba(255, 255, 255, 0.85) !important;
+      border: 1.5px solid rgba(0, 120, 212, 0.7) !important;
+      box-shadow: 0 8px 24px rgba(0, 120, 212, 0.22), inset 0 0 16px rgba(0, 120, 212, 0.14) !important;
+      color: #005a9e !important;
+      font-weight: 700 !important;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+    }
+
+    body.theme-light .cube-3d-scene .cube-face {
+      background: rgba(255, 255, 255, 0.9) !important;
+      border: 1.5px solid rgba(0, 120, 212, 0.8) !important;
+      color: #005a9e !important;
+    }
+
+    body.theme-light .mobile-swipe-handle {
+      background: rgba(0, 0, 0, 0.35) !important;
     }
 
 
@@ -2289,13 +2817,13 @@
     .mobile-only { display: none !important; }
 
     @media (max-width: 768px) {
-      /* ---- Mobile theme: solid dark, no purple aurora bleed ---- */
+      /* ---- Mobile theme: Windows 11 Fluent dark acrylic ---- */
       :root {
-        --win-glass: #181926 !important;
-        --win-glass-active: #202232 !important;
-        --win-glass-border: rgba(255, 255, 255, 0.12) !important;
-        --win-glass-active-border: rgba(0, 120, 212, 0.70) !important;
-        --taskbar-h: 56px;
+        --win-glass: rgba(22, 25, 40, 0.92) !important;
+        --win-glass-active: rgba(28, 32, 54, 0.96) !important;
+        --win-glass-border: rgba(255, 255, 255, 0.14) !important;
+        --win-glass-active-border: rgba(0, 120, 212, 0.75) !important;
+        --taskbar-h: 68px;
       }
 
       /* Completely hide purple aurora bleed-through on mobile */
@@ -2307,16 +2835,10 @@
         display: none !important;
       }
 
-      /* Solid desktop background on mobile - same dark base as laptop (no purple bloom) */
+      /* Authentic Windows 11 Desktop Viewport & Wallpaper on Mobile */
       #desktop {
-        background-color: #080914 !important;
-        background-image:
-          radial-gradient(ellipse 65% 50% at 50% 40%, rgba(0, 120, 240, 0.42) 0%, transparent 72%),
-          radial-gradient(circle at 50% 50%, #0c1022 0%, #060811 100%) !important;
-        background-attachment: local !important;
-      }
-      /* Mobile Desktop Viewport */
-      #desktop {
+        background-color: transparent !important;
+        background-image: none !important;
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
@@ -2327,13 +2849,52 @@
         overflow: hidden !important;
       }
 
-      #wallpaper-canvas {
-        pointer-events: auto !important;
+      .desktop-wallpaper {
+        background-position: center center !important;
+        background-size: cover !important;
+        background-attachment: scroll !important;
       }
 
-      .cube-3d-scene {
-        display: none !important;
+      body.theme-light .desktop-wallpaper {
+        background-position: center center !important;
+        background-size: cover !important;
       }
+
+      #wallpaper-canvas {
+        pointer-events: none !important;
+      }
+
+      /* 3D Interactive Floating Prism Cube on Mobile Desktop */
+      .cube-3d-scene {
+        display: block !important;
+        position: absolute !important;
+        right: 16px !important;
+        bottom: calc(var(--taskbar-h) + 16px) !important;
+        width: 86px !important;
+        height: 86px !important;
+        perspective: 700px !important;
+        pointer-events: none !important;
+        z-index: 3 !important;
+        opacity: 0.82 !important;
+        transition: filter 0.35s ease, opacity 0.35s ease !important;
+      }
+
+      .cube-3d-scene .cube-face {
+        width: 86px !important;
+        height: 86px !important;
+        font-size: 9px !important;
+        border-width: 1.5px !important;
+        border-color: rgba(0, 212, 255, 0.5) !important;
+        background: rgba(14, 165, 233, 0.08) !important;
+        box-shadow: inset 0 0 14px rgba(0, 212, 255, 0.25) !important;
+      }
+
+      .cube-3d-scene .cube-front  { transform: rotateY(0deg) translateZ(43px) !important; }
+      .cube-3d-scene .cube-back   { transform: rotateY(180deg) translateZ(43px) !important; }
+      .cube-3d-scene .cube-right  { transform: rotateY(90deg) translateZ(43px) !important; }
+      .cube-3d-scene .cube-left   { transform: rotateY(-90deg) translateZ(43px) !important; }
+      .cube-3d-scene .cube-top    { transform: rotateX(90deg) translateZ(43px) !important; }
+      .cube-3d-scene .cube-bottom { transform: rotateX(-90deg) translateZ(43px) !important; }
 
       #desktop-icons {
         position: absolute;
@@ -2371,6 +2932,19 @@
       /* Window Management on Mobile:
          Full-screen windows with solid dark backgrounds (no purple bleed).
          Stop above taskbar so it's never covered. */
+      #windows-container {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: var(--taskbar-h) !important;
+        width: 100vw !important;
+        height: calc(100vh - var(--taskbar-h)) !important;
+        height: calc(100dvh - var(--taskbar-h)) !important;
+        z-index: 500 !important;
+        pointer-events: none !important;
+      }
+
       .os-window {
         display: none !important;
       }
@@ -2394,17 +2968,36 @@
         opacity: 1 !important;
         visibility: visible !important;
         z-index: 500 !important;
-        background: #181926 !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        box-shadow: none !important;
+        background: rgba(18, 20, 32, 0.94) !important;
+        backdrop-filter: blur(32px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(32px) saturate(180%) !important;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.8) !important;
         overflow: hidden !important;
+        pointer-events: auto !important;
+      }
+
+      .os-window.open:not(.minimized) * {
+        pointer-events: auto;
+      }
+
+      .mobile-swipe-handle {
+        display: block !important;
+        position: absolute !important;
+        top: 6px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 44px !important;
+        height: 4.5px !important;
+        background: rgba(255, 255, 255, 0.55) !important;
+        border-radius: 99px !important;
+        pointer-events: none !important;
+        z-index: 5 !important;
       }
 
       .os-window.active {
-        background: #1c1d2e !important;
-        border-color: rgba(0, 120, 212, 0.4) !important;
-        box-shadow: none !important;
+        background: rgba(22, 25, 40, 0.96) !important;
+        border-color: rgba(0, 120, 212, 0.5) !important;
+        box-shadow: 0 0 35px rgba(0, 120, 212, 0.25) !important;
       }
 
       .os-window.maximized {
@@ -2418,30 +3011,21 @@
         justify-content: space-between !important;
         align-items: center !important;
         width: 100% !important;
-        height: 48px !important;
-        min-height: 48px !important;
-        padding: 0 0 0 12px !important;
+        height: 50px !important;
+        min-height: 50px !important;
+        max-height: 50px !important;
+        padding: 0 0 0 14px !important;
+        flex: 0 0 50px !important;
         flex-shrink: 0 !important;
-        background: #202232 !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background: rgba(26, 30, 48, 0.95) !important;
+        backdrop-filter: blur(24px) !important;
+        -webkit-backdrop-filter: blur(24px) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
         user-select: none !important;
         -webkit-user-select: none !important;
         touch-action: pan-y !important;
         box-sizing: border-box !important;
-      }
-
-      .mobile-swipe-handle {
-        display: block !important;
-        position: absolute !important;
-        top: 5px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        width: 40px !important;
-        height: 4px !important;
-        background: rgba(255, 255, 255, 0.5) !important;
-        border-radius: 99px !important;
-        pointer-events: none !important;
-        z-index: 5 !important;
+        pointer-events: auto !important;
       }
 
       .window-title-group {
@@ -2492,15 +3076,15 @@
 
       .window-controls .btn-min {
         display: flex !important;
-        width: 50px !important;
-        min-width: 50px !important;
-        background: rgba(255, 255, 255, 0.06) !important;
+        width: 52px !important;
+        min-width: 52px !important;
+        background: rgba(255, 255, 255, 0.08) !important;
         color: #ffffff !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-left: 1px solid rgba(255, 255, 255, 0.10) !important;
       }
 
       .window-controls .btn-min:active {
-        background: rgba(255, 255, 255, 0.22) !important;
+        background: rgba(255, 255, 255, 0.25) !important;
       }
 
       .window-controls .btn-max {
@@ -2509,11 +3093,11 @@
 
       .window-controls .btn-close {
         display: flex !important;
-        width: 54px !important;
-        min-width: 54px !important;
-        background: rgba(255, 255, 255, 0.06) !important;
+        width: 56px !important;
+        min-width: 56px !important;
+        background: rgba(255, 255, 255, 0.08) !important;
         color: #ffffff !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-left: 1px solid rgba(255, 255, 255, 0.10) !important;
       }
 
       .window-controls .btn-close:active {
@@ -2521,7 +3105,8 @@
         color: #ffffff !important;
       }
 
-      .window-controls .win-btn svg {
+      .window-controls .win-btn svg,
+      .window-controls .win-btn svg use {
         pointer-events: none !important;
         width: 12px !important;
         height: 12px !important;
@@ -2529,22 +3114,77 @@
 
       /* Window Content Scroll Area - guaranteed touch scrolling on mobile */
       .window-content {
-        flex: 1 1 auto !important;
+        flex: 1 1 0px !important;
+        min-height: 0 !important;
+        height: auto !important;
+        max-height: none !important;
         display: block !important;
         width: 100% !important;
-        height: calc(100% - 48px) !important;
-        max-height: calc(100% - 48px) !important;
-        min-height: 0 !important;
-        overflow-y: scroll !important;
+        overflow-y: auto !important;
         overflow-x: hidden !important;
         -webkit-overflow-scrolling: touch !important;
         touch-action: pan-y !important;
-        overscroll-behavior-y: contain !important;
+        overscroll-behavior-y: auto !important;
+        pointer-events: auto !important;
         position: relative !important;
-        padding: 18px 16px 64px 16px !important;
-        background: #14151f !important;
+        padding: 16px 16px 80px 16px !important;
+        background: rgba(14, 16, 26, 0.92) !important;
         color: #ffffff !important;
         box-sizing: border-box !important;
+      }
+
+      /* Windows standard behavior on mobile: background wallpaper & icons stay visible without blur */
+      body.has-open-window .desktop-wallpaper,
+      body.theme-light.has-open-window .desktop-wallpaper {
+        filter: none !important;
+        transform: none !important;
+      }
+
+      body.has-open-window #desktop-icons {
+        filter: none !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+      }
+
+      body.has-open-window .cube-3d-scene {
+        filter: none !important;
+        opacity: 0.82 !important;
+      }
+
+      body.has-open-window #wallpaper-canvas {
+        filter: none !important;
+      }
+
+      /* Ensure the open window on mobile is ALWAYS 100% sharp, solid, and opaque */
+      .os-window,
+      .os-window.open,
+      .os-window.active {
+        background: #1f2230 !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      .window-content {
+        background: #1f2230 !important;
+      }
+
+      body.theme-light .os-window,
+      body.theme-light .os-window.open,
+      body.theme-light .os-window.active {
+        background: #ffffff !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      body.theme-light .window-content {
+        background: #ffffff !important;
+      }
+
+      .os-window,
+      .os-window *,
+      .os-window.open,
+      .os-window.open * {
+        filter: none !important;
       }
 
       .about-hero {
@@ -2599,17 +3239,9 @@
       /* Mobile Taskbar:
          Fixed at bottom, hidden completely when lock screen shows.
          Solid background, prominent layout. */
-            .desktop-window-backdrop {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: var(--taskbar-h) !important;
-        width: 100vw !important;
-        height: auto !important;
-        background: rgba(6, 8, 16, 0.65) !important;
-        backdrop-filter: blur(14px) !important;
-        -webkit-backdrop-filter: blur(14px) !important;
+      .desktop-window-backdrop {
+        display: none !important;
+        pointer-events: none !important;
       }
 
       #taskbar {
@@ -2618,16 +3250,17 @@
         left: 0 !important;
         width: 100vw !important;
         height: var(--taskbar-h) !important;
-        padding: 0 8px !important;
+        padding: 0 10px !important;
+        padding-bottom: env(safe-area-inset-bottom, 0px) !important;
         z-index: 600 !important;
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
-        background: #13141f !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
-        box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.8) !important;
+        background: rgba(19, 21, 33, 0.96) !important;
+        backdrop-filter: blur(28px) !important;
+        -webkit-backdrop-filter: blur(28px) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+        box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.85) !important;
       }
 
       /* Taskbar hidden when lock screen active */
@@ -2639,7 +3272,7 @@
         display: none !important;
       }
 
-      /* Scrollable Taskbar Center Dock */
+      /* Scrollable Taskbar Center Dock with comfortable mobile sizing */
       .taskbar-center {
         position: static !important;
         left: auto !important;
@@ -2653,39 +3286,45 @@
         -webkit-overflow-scrolling: touch !important;
         touch-action: pan-x !important;
         scrollbar-width: none !important;
-        gap: 6px !important;
-        padding: 0 6px !important;
+        gap: 8px !important;
+        padding: 0 4px !important;
       }
 
       .taskbar-center::-webkit-scrollbar {
         display: none !important;
       }
 
-      /* Start button pinned on the left of dock */
+      /* Start button pinned on the left of dock with solid opaque backdrop */
       #start-btn {
         position: sticky !important;
         left: 0 !important;
-        z-index: 10 !important;
-        background: rgba(0, 120, 212, 0.18) !important;
-        border: 1px solid rgba(0, 120, 212, 0.4) !important;
+        z-index: 20 !important;
+        background: #181a26 !important;
+        border: 1px solid rgba(0, 120, 212, 0.6) !important;
         border-radius: var(--radius-md) !important;
         flex-shrink: 0 !important;
-        width: 44px !important;
-        height: 44px !important;
-        box-shadow: 0 0 10px rgba(0, 120, 212, 0.25) !important;
+        width: 48px !important;
+        height: 48px !important;
+        box-shadow: 4px 0 14px rgba(0, 0, 0, 0.65), 0 0 12px rgba(0, 120, 212, 0.3) !important;
         margin-right: 4px !important;
       }
 
+      body.theme-light #start-btn {
+        background: #e9eff8 !important;
+        border: 1px solid rgba(0, 120, 212, 0.5) !important;
+        box-shadow: 4px 0 14px rgba(0, 0, 0, 0.15) !important;
+      }
+
       .taskbar-btn {
-        width: 44px !important;
-        height: 44px !important;
+        width: 48px !important;
+        height: 48px !important;
         flex-shrink: 0 !important;
         border-radius: var(--radius-md) !important;
       }
 
       .taskbar-btn.is-active {
-        background: rgba(0, 120, 212, 0.25) !important;
-        border: 1px solid rgba(0, 120, 212, 0.5) !important;
+        background: rgba(0, 120, 212, 0.28) !important;
+        border: 1px solid rgba(0, 120, 212, 0.55) !important;
       }
 
       .taskbar-btn.is-open::after {
@@ -2695,8 +3334,8 @@
       }
 
       .taskbar-btn .win-app-svg {
-        width: 26px !important;
-        height: 26px !important;
+        width: 28px !important;
+        height: 28px !important;
       }
 
       /* Right System Tray & Live Clock */
@@ -2705,7 +3344,7 @@
         align-items: center !important;
         flex-shrink: 0 !important;
         margin-left: 8px !important;
-        gap: 4px !important;
+        gap: 6px !important;
       }
 
       .tray-item:not(.tray-clock-item) {
@@ -2719,12 +3358,27 @@
       .tray-clock-item {
         display: flex !important;
         align-items: center !important;
-        padding: 5px 10px !important;
+        padding: 4px 10px !important;
         flex-shrink: 0 !important;
-        background: rgba(255, 255, 255, 0.07) !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.14) !important;
         border-radius: var(--radius-md) !important;
-        min-width: 76px !important;
+        min-width: 82px !important;
+        height: 48px !important;
+      }
+
+      #calendar-flyout {
+        position: fixed !important;
+        bottom: var(--taskbar-h) !important;
+        right: 8px !important;
+        left: 8px !important;
+        width: auto !important;
+        max-width: calc(100vw - 16px) !important;
+        border-radius: 16px 16px var(--radius-md) var(--radius-md) !important;
+        background: rgba(24, 26, 42, 0.96) !important;
+        box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.85) !important;
+        z-index: 10002 !important;
+        padding: 16px !important;
       }
 
       .tray-clock {
@@ -2818,6 +3472,27 @@
         background: rgba(0, 0, 0, 0.3) !important;
         border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
       }
+
+      /* Hide battery and wifi on mobile lock screen glance & perfectly center swipe text */
+      .lock-glance-tray {
+        display: none !important;
+      }
+
+      .lock-glance-bottom {
+        justify-content: center !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        text-align: center !important;
+        padding-bottom: 8px !important;
+      }
+
+      .lock-swipe-indicator {
+        margin: 0 auto !important;
+        text-align: center !important;
+        width: 100% !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
     }
 
     .mobile-swipe-handle {
@@ -2835,9 +3510,11 @@
       z-index: 999999 !important;
       display: flex;
       flex-direction: column;
-      background: radial-gradient(circle at 50% 25%, #0d2847 0%, #06111f 65%, #030810 100%);
+      background-color: #020818;
+      background-image: url('assets/wallpaper-win11-dark.jpg');
       background-size: cover;
-      background-position: center;
+      background-position: center center;
+      background-repeat: no-repeat;
       transition: opacity 0.45s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
       overflow: hidden;
       user-select: none;
@@ -2865,7 +3542,7 @@
       align-items: center;
       padding: clamp(40px, 8vh, 90px) 24px 32px 24px;
       cursor: pointer;
-      background: radial-gradient(circle at 50% 30%, rgba(20, 45, 80, 0.35) 0%, rgba(5, 12, 22, 0.75) 100%);
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.30) 0%, transparent 40%, rgba(0, 0, 0, 0.50) 100%);
       transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
       z-index: 2;
     }
@@ -3322,7 +3999,61 @@
       color: var(--text-muted);
     }
 
-    /* Powered Off Black Screen */
+    /* Powered Off Deep Black Screen with Stars Animation */
+    .power-off-stars-screen {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000000 !important;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: clamp(28px, 7vh, 64px);
+      cursor: pointer;
+      user-select: none;
+      z-index: 1000002;
+    }
+
+    .shutdown-stars-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .shutdown-wake-hint {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 24px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      transition: all 0.25s ease;
+      animation: pulseWakeHint 3s ease-in-out infinite;
+    }
+
+    .shutdown-wake-hint:hover {
+      background: rgba(0, 120, 212, 0.45);
+      color: #ffffff;
+      border-color: rgba(0, 120, 212, 0.8);
+      transform: scale(1.04);
+    }
+
+    @keyframes pulseWakeHint {
+      0%, 100% { opacity: 0.6; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-4px); }
+    }
+
     .power-off-box {
       display: flex;
       flex-direction: column;
@@ -3516,8 +4247,6 @@
 
   <!-- 3D Three.js Background Canvas -->
   <canvas id="wallpaper-canvas"></canvas>
-    <!-- Desktop Window Acrylic Backdrop Blur Overlay -->
-    <div id="desktop-window-backdrop" class="desktop-window-backdrop" onclick="WindowManager.minimizeActive()"></div>
 
   <!-- Aurora Borealis Glow Spheres -->
   <div class="aurora-glow aurora-1"></div>
@@ -3527,6 +4256,9 @@
 
   <!-- DESKTOP CONTAINER -->
   <main id="desktop">
+
+    <!-- Authentic Windows 11 Wallpaper Layer -->
+    <div id="desktop-wallpaper" class="desktop-wallpaper" aria-hidden="true"></div>
 
     <!-- CSS 3D Floating Rotating Prism Cube -->
     <div class="cube-3d-scene">
@@ -3599,6 +4331,9 @@
         <span class="desktop-icon-label">Resume.pdf</span>
       </div>
     </div>
+
+    <!-- Desktop Window Acrylic Backdrop Blur Overlay (Desktop only) -->
+    <div id="desktop-window-backdrop" class="desktop-window-backdrop" onclick="WindowManager.minimizeActive()"></div>
 
     <!-- WINDOWS CONTAINER -->
     <div id="windows-container">
@@ -4663,41 +5398,53 @@
       </div>
     </div>
 
-    <!-- Quick Settings & Calendar Flyout -->
+    <!-- Quick Settings & Action Center Flyout (Windows 11) -->
     <div id="calendar-flyout">
-      <div class="calendar-clock-big" id="cal-big-time">10:45:00 PM</div>
-      <div class="calendar-date-big" id="cal-big-date">Tuesday, November 3, 2026</div>
+      <div class="calendar-header-row">
+        <div>
+          <div class="calendar-clock-big" id="cal-big-time">10:45:00 PM</div>
+          <div class="calendar-date-big" id="cal-big-date">Tuesday, November 3, 2026</div>
+        </div>
+        <button class="calendar-close-btn" onclick="closeCalendar()" title="Close Quick Settings">✕</button>
+      </div>
 
       <div class="quick-toggles-grid">
-        <div class="quick-toggle-btn active" onclick="this.classList.toggle('active')">
-          <i class="fa-solid fa-wifi"></i>
-          <span>Wi-Fi</span>
+        <div class="quick-toggle-btn active" id="toggle-wifi-btn" onclick="toggleQuickWifi(this)" title="Toggle Wi-Fi connection">
+          <i class="fa-solid fa-wifi" id="toggle-wifi-icon"></i>
+          <span id="toggle-wifi-label">Wi-Fi</span>
         </div>
-        <div class="quick-toggle-btn active" onclick="this.classList.toggle('active')">
-          <i class="fa-brands fa-bluetooth-b"></i>
-          <span>Bluetooth</span>
+        <div class="quick-toggle-btn active" id="toggle-bt-btn" onclick="toggleQuickBluetooth(this)" title="Toggle Bluetooth">
+          <i class="fa-brands fa-bluetooth-b" id="toggle-bt-icon"></i>
+          <span id="toggle-bt-label">Bluetooth</span>
         </div>
-        <div class="quick-toggle-btn active" onclick="this.classList.toggle('active')">
-          <i class="fa-solid fa-volume-high"></i>
-          <span>Sound</span>
+        <div class="quick-toggle-btn active" id="toggle-dark-mode-btn" onclick="toggleDarkMode(this)" title="Toggle Dark and Light Mode">
+          <i class="fa-solid fa-moon" id="toggle-theme-icon"></i>
+          <span id="toggle-theme-label">Dark Mode</span>
         </div>
-        <div class="quick-toggle-btn active" onclick="this.classList.toggle('active')">
-          <i class="fa-solid fa-cube"></i>
-          <span>3D Motion</span>
+        <div class="quick-toggle-btn active" id="toggle-sound-btn" onclick="toggleQuickSound(this)" title="Toggle Sound">
+          <i class="fa-solid fa-volume-high" id="toggle-sound-icon"></i>
+          <span id="toggle-sound-label">Sound</span>
         </div>
-        <div class="quick-toggle-btn" onclick="this.classList.toggle('active')">
-          <i class="fa-solid fa-moon"></i>
-          <span>Night Light</span>
+        <div class="quick-toggle-btn active" id="toggle-anim-btn" onclick="toggleQuickAnimations(this)" title="Toggle 3D & Animations">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span id="toggle-anim-label">Animations</span>
         </div>
-        <div class="quick-toggle-btn" onclick="openWindow('win-contact')">
-          <i class="fa-solid fa-bell"></i>
-          <span>Alerts</span>
+        <div class="quick-toggle-btn" onclick="openWindow('win-contact'); closeCalendar();" title="Get in touch">
+          <i class="fa-solid fa-envelope"></i>
+          <span>Contact Me</span>
         </div>
+      </div>
+
+      <!-- Brightness Slider matching Windows 11 Quick Settings in screenshot -->
+      <div class="quick-brightness-row">
+        <i class="fa-regular fa-sun" style="font-size: 14px; color: var(--text-secondary);"></i>
+        <input type="range" id="quick-brightness" min="30" max="100" value="100" class="win-slider" oninput="adjustBrightness(this.value)" title="Display Brightness">
       </div>
     </div>
 
     <!-- START MENU -->
     <div id="start-menu">
+      <div class="mobile-swipe-handle" id="start-menu-swipe-handle"></div>
       <div class="start-search-bar">
         <div class="search-input-wrapper">
           <i class="fa-solid fa-magnifying-glass"></i>
@@ -5086,17 +5833,13 @@
       <div class="power-status-desc" id="power-status-sub">Closing applications &amp; saving session state</div>
     </div>
 
-    <!-- Powered Off Black Screen State -->
-    <div id="power-off-state" class="power-off-box" style="display: none;">
-      <div class="power-off-glyph">
+    <!-- Powered Off Deep Black Screen with Stars Animation -->
+    <div id="power-off-state" class="power-off-stars-screen" style="display: none;" onclick="wakeFromShutdown()" title="Click or tap anywhere to turn on PC">
+      <canvas id="shutdown-stars-canvas" class="shutdown-stars-canvas"></canvas>
+      <div class="shutdown-wake-hint">
         <i class="fa-solid fa-power-off"></i>
+        <span>Click or tap anywhere to wake PC</span>
       </div>
-      <div class="power-off-heading">PC is Shut Down</div>
-      <div class="power-off-detail">Sushrut OS environment powered off.</div>
-      <button class="power-on-btn" onclick="powerOnSystem()">
-        <i class="fa-solid fa-power-off"></i> Turn On PC
-      </button>
-      <div class="power-off-subhint">Or refresh your browser to reboot to Lock Screen</div>
     </div>
   </div>
 
@@ -5137,22 +5880,12 @@
             this.setupDraggable(winEl, titlebar);
           }
 
-          // Stop propagation on window controls so titlebar drag never hijacks button taps
-          const winControls = winEl.querySelector('.window-controls');
-          if (winControls) {
-            winControls.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
-            winControls.addEventListener('touchmove', (e) => e.stopPropagation(), { passive: true });
-            winControls.addEventListener('touchend', (e) => e.stopPropagation(), { passive: true });
-            winControls.addEventListener('mousedown', (e) => e.stopPropagation());
-          }
-
           const btnMin = winEl.querySelector('.btn-min');
           const btnMax = winEl.querySelector('.btn-max');
           const btnClose = winEl.querySelector('.btn-close');
 
           const doMin = (e) => {
             if (e) {
-              e.preventDefault();
               e.stopPropagation();
             }
             WindowManager.minimize(id);
@@ -5160,26 +5893,30 @@
 
           const doClose = (e) => {
             if (e) {
-              e.preventDefault();
               e.stopPropagation();
             }
             WindowManager.close(id);
           };
 
           if (btnMin) {
-            btnMin.addEventListener('click', doMin);
-            btnMin.addEventListener('touchend', doMin);
+            btnMin.onclick = doMin;
           }
           if (btnMax) {
-            btnMax.addEventListener('click', (e) => { e.stopPropagation(); WindowManager.toggleMaximize(id); });
+            btnMax.onclick = (e) => {
+              if (e) e.stopPropagation();
+              WindowManager.toggleMaximize(id);
+            };
           }
           if (btnClose) {
-            btnClose.addEventListener('click', doClose);
-            btnClose.addEventListener('touchend', doClose);
+            btnClose.onclick = doClose;
           }
 
-          // Click anywhere to focus
-          winEl.addEventListener('mousedown', () => this.focus(id));
+          // Focus window on pointerdown
+          winEl.addEventListener('pointerdown', () => {
+            if (this.activeWindow !== id) {
+              this.focus(id);
+            }
+          });
         });
 
         // Taskbar App Buttons
@@ -5244,12 +5981,14 @@
         win.el.classList.remove('minimized');
         win.el.classList.add('open');
 
-        // On mobile, set explicit viewport height so content scrolls reliably
+        // On mobile, reset inline styles so responsive flexbox CSS applies cleanly
         if (window.innerWidth <= 768) {
-          win.el.style.top = '0px';
-          win.el.style.left = '0px';
-          win.el.style.width = '100vw';
-          win.el.style.height = 'calc(100vh - 56px)';
+          win.el.style.top = '';
+          win.el.style.left = '';
+          win.el.style.width = '';
+          win.el.style.height = '';
+          win.el.style.transform = '';
+          win.el.style.opacity = '';
         }
 
         this.focus(id);
@@ -5262,6 +6001,14 @@
         if (!win) return;
 
         win.el.classList.remove('open', 'active');
+        if (window.innerWidth <= 768) {
+          win.el.style.top = '';
+          win.el.style.left = '';
+          win.el.style.width = '';
+          win.el.style.height = '';
+          win.el.style.transform = '';
+          win.el.style.opacity = '';
+        }
         if (this.activeWindow === id) this.activeWindow = null;
         this.updateTaskbarState(id);
         this.updateBackdropBlur();
@@ -5288,9 +6035,28 @@
 
         win.isMinimized = false;
         win.el.classList.remove('minimized');
+        if (window.innerWidth <= 768) {
+          win.el.style.top = '';
+          win.el.style.left = '';
+          win.el.style.width = '';
+          win.el.style.height = '';
+          win.el.style.transform = '';
+          win.el.style.opacity = '';
+        }
         this.focus(id);
         this.updateTaskbarState(id);
         this.updateBackdropBlur();
+      },
+
+      updateBackdropBlur() {
+        const hasOpen = Object.values(this.windows).some(w => w && w.el && w.el.classList.contains('open') && !w.isMinimized);
+        document.body.classList.toggle('has-open-window', hasOpen);
+      },
+
+      minimizeActive() {
+        if (this.activeWindow) {
+          this.minimize(this.activeWindow);
+        }
       },
 
       toggleMaximize(id) {
@@ -5510,6 +6276,92 @@
       calendarFlyout.classList.remove('open');
     }
 
+    /* Windows 11 Quick Settings: Dark/Light Mode & System Controls */
+    function toggleDarkMode(btn) {
+      const isLight = document.body.classList.toggle('theme-light');
+      const icon = document.getElementById('toggle-theme-icon');
+      const label = document.getElementById('toggle-theme-label');
+      const toggleBtn = btn || document.getElementById('toggle-dark-mode-btn');
+
+      if (isLight) {
+        // Light Mode is active -> Dark Mode toggle is OFF (neutral, not blue)
+        if (icon) icon.className = 'fa-solid fa-sun';
+        if (label) label.textContent = 'Light Mode';
+        if (toggleBtn) toggleBtn.classList.remove('active');
+        localStorage.setItem('win11_theme', 'light');
+        showToast('Personalization', 'Light Mode enabled');
+      } else {
+        // Dark Mode is active -> Dark Mode toggle is ON (highlighted blue)
+        if (icon) icon.className = 'fa-solid fa-moon';
+        if (label) label.textContent = 'Dark Mode';
+        if (toggleBtn) toggleBtn.classList.add('active');
+        localStorage.setItem('win11_theme', 'dark');
+        showToast('Personalization', 'Dark Mode enabled');
+      }
+    }
+
+    function toggleQuickWifi(btn) {
+      const isActive = btn.classList.toggle('active');
+      const label = document.getElementById('toggle-wifi-label');
+      if (isActive) {
+        if (label) label.textContent = 'Wi-Fi';
+        showToast('Network', 'Wi-Fi connected: 5GHz High-Speed');
+      } else {
+        if (label) label.textContent = 'Wi-Fi Off';
+        showToast('Network', 'Wi-Fi disconnected');
+      }
+    }
+
+    function toggleQuickBluetooth(btn) {
+      const isActive = btn.classList.toggle('active');
+      const label = document.getElementById('toggle-bt-label');
+      if (isActive) {
+        if (label) label.textContent = 'Bluetooth';
+        showToast('Bluetooth', 'Bluetooth discovery enabled');
+      } else {
+        if (label) label.textContent = 'Bluetooth Off';
+        showToast('Bluetooth', 'Bluetooth turned off');
+      }
+    }
+
+    function toggleQuickSound(btn) {
+      const isActive = btn.classList.toggle('active');
+      const icon = document.getElementById('toggle-sound-icon');
+      const label = document.getElementById('toggle-sound-label');
+      if (isActive) {
+        if (icon) icon.className = 'fa-solid fa-volume-high';
+        if (label) label.textContent = 'Sound';
+        showToast('Audio', 'System audio enabled');
+      } else {
+        if (icon) icon.className = 'fa-solid fa-volume-xmark';
+        if (label) label.textContent = 'Muted';
+        showToast('Audio', 'System audio muted');
+      }
+    }
+
+    let animationsActive = true;
+    function toggleQuickAnimations(btn) {
+      animationsActive = !animationsActive;
+      btn.classList.toggle('active', animationsActive);
+      const label = document.getElementById('toggle-anim-label');
+      if (animationsActive) {
+        if (label) label.textContent = 'Animations';
+        document.body.classList.remove('reduce-motion');
+        showToast('Display Settings', 'Fluent 3D animations active');
+      } else {
+        if (label) label.textContent = 'Animations Off';
+        document.body.classList.add('reduce-motion');
+        showToast('Display Settings', 'Reduced motion mode active');
+      }
+    }
+
+    function adjustBrightness(val) {
+      const desktop = document.getElementById('desktop');
+      if (desktop) {
+        desktop.style.filter = 'brightness(' + (val / 100) + ')';
+      }
+    }
+
     startBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       toggleStartMenu();
@@ -5544,6 +6396,11 @@
       closeCalendar();
       WindowManager.open(id);
     }
+    window.openWindow = openWindow;
+    window.closeWindow = (id) => WindowManager.close(id);
+    window.minimizeWindow = (id) => WindowManager.minimize(id);
+    window.minimize = (id) => WindowManager.minimize(id);
+    window.minimizeActive = () => WindowManager.minimizeActive();
 
     function closeContextMenu() {
       const cm = document.getElementById('context-menu');
@@ -5808,10 +6665,10 @@
        7. 3D TILT EFFECT ON PROJECT CARDS
        ========================================================================== */
     document.querySelectorAll('.tilt-card').forEach((card) => {
-      card.addEventListener('mousemove', (e) => {
+      const handleTilt = (clientX, clientY) => {
         const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
 
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
@@ -5825,12 +6682,57 @@
         const percentY = (y / rect.height) * 100;
         card.style.setProperty('--mouse-x', `${percentX}%`);
         card.style.setProperty('--mouse-y', `${percentY}%`);
+      };
+
+      card.addEventListener('mousemove', (e) => handleTilt(e.clientX, e.clientY));
+      card.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches[0]) {
+          handleTilt(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: true });
+
+      const resetTilt = () => {
+        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      };
+
+      card.addEventListener('mouseleave', resetTilt);
+      card.addEventListener('touchend', resetTilt, { passive: true });
+    });
+
+    /* Interactive 3D Prism Cube Swivel on Cursor & Touch */
+    (function initInteractive3DCube() {
+      const cubeEl = document.querySelector('.cube-3d');
+      if (!cubeEl) return;
+
+      let baseRotX = 15, baseRotY = 0;
+      let cubeOffsetX = 0, cubeOffsetY = 0;
+
+      window.addEventListener('mousemove', (e) => {
+        const normX = (e.clientX / window.innerWidth) - 0.5;
+        const normY = (e.clientY / window.innerHeight) - 0.5;
+        cubeOffsetX = normX * 60;
+        cubeOffsetY = -normY * 45;
       });
 
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-      });
-    });
+      window.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches[0]) {
+          const normX = (e.touches[0].clientX / window.innerWidth) - 0.5;
+          const normY = (e.touches[0].clientY / window.innerHeight) - 0.5;
+          cubeOffsetX = normX * 80;
+          cubeOffsetY = -normY * 60;
+        }
+      }, { passive: true });
+
+      function animateCube() {
+        if (animationsActive) {
+          baseRotY = (baseRotY + 0.35) % 360;
+          baseRotX = (baseRotX + 0.12) % 360;
+          cubeEl.style.transform = `rotateX(${baseRotX + cubeOffsetY}deg) rotateY(${baseRotY + cubeOffsetX}deg)`;
+        }
+        requestAnimationFrame(animateCube);
+      }
+      animateCube();
+    })();
 
     /* ==========================================================================
        8. 3D FLIP CARDS ON SKILLS (CLICK OR HOVER)
@@ -6318,8 +7220,92 @@ LinkedIn: https://www.linkedin.com/in/sushrut-mhetras-a31774238/
         if (offState) offState.style.display = 'flex';
         sessionStorage.setItem('win11_power_state', 'shutdown');
         sessionStorage.removeItem('win11_session_state');
+        startShutdownStarsAnimation();
       }, 1800);
     }
+
+    /* Light Stars Particle Animation on Shutdown Screen */
+    let shutdownStarsAnimId = null;
+    function startShutdownStarsAnimation() {
+      const canvas = document.getElementById('shutdown-stars-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const stars = [];
+      const starCount = Math.floor(Math.min(window.innerWidth, window.innerHeight) / 10) + 50;
+      for (let i = 0; i < starCount; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.5 + 0.4,
+          baseAlpha: Math.random() * 0.4 + 0.25,
+          speed: Math.random() * 0.035 + 0.015,
+          phase: Math.random() * Math.PI * 2
+        });
+      }
+
+      function render(time) {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const t = time * 0.002;
+        for (const s of stars) {
+          const alpha = Math.max(0.12, Math.min(1, s.baseAlpha + Math.sin(t * s.speed * 80 + s.phase) * 0.4));
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+          if (s.radius > 1.2) {
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = '#60cdff';
+          } else {
+            ctx.shadowBlur = 0;
+          }
+          ctx.fill();
+        }
+        shutdownStarsAnimId = requestAnimationFrame(render);
+      }
+
+      cancelAnimationFrame(shutdownStarsAnimId);
+      shutdownStarsAnimId = requestAnimationFrame(render);
+    }
+
+    function stopShutdownStarsAnimation() {
+      if (shutdownStarsAnimId) {
+        cancelAnimationFrame(shutdownStarsAnimId);
+        shutdownStarsAnimId = null;
+      }
+    }
+
+    function wakeFromShutdown() {
+      const overlay = document.getElementById('win11-power-overlay');
+      const animState = document.getElementById('power-anim-state');
+      const offState = document.getElementById('power-off-state');
+      const statusTitle = document.getElementById('power-status-title');
+      const statusSub = document.getElementById('power-status-sub');
+
+      stopShutdownStarsAnimation();
+
+      if (offState) offState.style.display = 'none';
+      if (animState) animState.style.display = 'flex';
+      if (statusTitle) statusTitle.textContent = 'Starting Sushrut OS...';
+      if (statusSub) statusSub.textContent = 'Windows 11 Fluent environment';
+
+      setTimeout(() => {
+        if (overlay) {
+          overlay.style.display = 'none';
+          overlay.classList.remove('active');
+        }
+        sessionStorage.removeItem('win11_power_state');
+        initLockScreen(true);
+        document.body.classList.add('lock-active');
+      }, 1200);
+    }
+    window.powerOnSystem = wakeFromShutdown;
+    window.wakeFromShutdown = wakeFromShutdown;
 
     function triggerRestart() {
       closeStartMenu();
@@ -6433,6 +7419,43 @@ LinkedIn: https://www.linkedin.com/in/sushrut-mhetras-a31774238/
       }
     });
 
+    // Mobile swipe down on Start Menu to dismiss
+    (function setupStartMenuSwipe() {
+      const menu = document.getElementById('start-menu');
+      if (!menu) return;
+
+      let startY = 0;
+      let startX = 0;
+      let currentY = 0;
+      let isTracking = false;
+
+      menu.addEventListener('touchstart', (e) => {
+        if (!menu.classList.contains('open')) return;
+        if (e.touches && e.touches[0]) {
+          startY = e.touches[0].clientY;
+          startX = e.touches[0].clientX;
+          currentY = startY;
+          isTracking = true;
+        }
+      }, { passive: true });
+
+      menu.addEventListener('touchmove', (e) => {
+        if (!isTracking || !e.touches || !e.touches[0]) return;
+        currentY = e.touches[0].clientY;
+      }, { passive: true });
+
+      menu.addEventListener('touchend', () => {
+        if (!isTracking) return;
+        isTracking = false;
+        const deltaY = currentY - startY;
+        const deltaX = Math.abs(currentY - startY);
+        // If swiped down by at least 45px, dismiss
+        if (deltaY > 45) {
+          closeStartMenu();
+        }
+      }, { passive: true });
+    })();
+
     // Mobile swipe up on Glance lock screen to show PIN
     (function setupGlanceSwipe() {
       const glance = document.getElementById('lock-glance');
@@ -6469,6 +7492,18 @@ LinkedIn: https://www.linkedin.com/in/sushrut-mhetras-a31774238/
 
     // Initialize Windows Manager & Session Lifecycle on DOM ready
     window.addEventListener('DOMContentLoaded', () => {
+      // Restore persisted Light / Dark Mode theme
+      const savedTheme = localStorage.getItem('win11_theme');
+      if (savedTheme === 'light') {
+        document.body.classList.add('theme-light');
+        const icon = document.getElementById('toggle-theme-icon');
+        const label = document.getElementById('toggle-theme-label');
+        const toggleBtn = document.getElementById('toggle-dark-mode-btn');
+        if (icon) icon.className = 'fa-solid fa-sun';
+        if (label) label.textContent = 'Light Mode';
+        if (toggleBtn) toggleBtn.classList.remove('active');
+      }
+
       WindowManager.init();
 
       const powerState = sessionStorage.getItem('win11_power_state');
