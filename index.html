@@ -409,6 +409,37 @@
       z-index: 20;
     }
 
+        /* Desktop Window Acrylic Backdrop Blur */
+    .desktop-window-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100%;
+      background: rgba(4, 6, 14, 0.42);
+      backdrop-filter: blur(14px) saturate(140%);
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      z-index: 40;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body.has-open-window .desktop-window-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    body.has-open-window #wallpaper-canvas {
+      filter: blur(12px) brightness(0.65);
+      transition: filter 0.35s ease;
+    }
+
+    body.has-open-window #desktop-icons {
+      filter: blur(6px) brightness(0.70);
+      transition: filter 0.35s ease;
+    }
+
     .os-window {
       position: absolute;
       display: flex;
@@ -2353,8 +2384,9 @@
         right: 0 !important;
         bottom: var(--taskbar-h) !important;
         width: 100vw !important;
-        height: auto !important;
-        max-height: none !important;
+        height: calc(100vh - var(--taskbar-h)) !important;
+        height: calc(100dvh - var(--taskbar-h)) !important;
+        max-height: calc(100dvh - var(--taskbar-h)) !important;
         margin: 0 !important;
         border-radius: 0 !important;
         border: none !important;
@@ -2362,11 +2394,11 @@
         opacity: 1 !important;
         visibility: visible !important;
         z-index: 500 !important;
-        /* Solid dark background - no purple bleed */
         background: #181926 !important;
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
         box-shadow: none !important;
+        overflow: hidden !important;
       }
 
       .os-window.active {
@@ -2441,7 +2473,8 @@
         flex: 0 0 auto !important;
         height: 100% !important;
         margin-left: auto !important;
-        z-index: 25 !important;
+        z-index: 50 !important;
+        pointer-events: auto !important;
       }
 
       .window-controls .win-btn {
@@ -2451,9 +2484,10 @@
         justify-content: center !important;
         height: 100% !important;
         cursor: pointer !important;
+        pointer-events: auto !important;
         touch-action: manipulation !important;
-        -webkit-tap-highlight-color: rgba(255, 255, 255, 0.15) !important;
-        z-index: 30 !important;
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0.25) !important;
+        z-index: 60 !important;
       }
 
       .window-controls .btn-min {
@@ -2493,17 +2527,24 @@
         height: 12px !important;
       }
 
-      /* Window Content Scroll Area */
+      /* Window Content Scroll Area - guaranteed touch scrolling on mobile */
       .window-content {
         flex: 1 1 auto !important;
+        display: block !important;
+        width: 100% !important;
+        height: calc(100% - 48px) !important;
+        max-height: calc(100% - 48px) !important;
         min-height: 0 !important;
-        height: 0 !important;
-        overflow-y: auto !important;
+        overflow-y: scroll !important;
         overflow-x: hidden !important;
         -webkit-overflow-scrolling: touch !important;
-        padding: 16px 16px 32px 16px !important;
-        background: #181926 !important;
+        touch-action: pan-y !important;
+        overscroll-behavior-y: contain !important;
+        position: relative !important;
+        padding: 18px 16px 64px 16px !important;
+        background: #14151f !important;
         color: #ffffff !important;
+        box-sizing: border-box !important;
       }
 
       .about-hero {
@@ -2558,6 +2599,19 @@
       /* Mobile Taskbar:
          Fixed at bottom, hidden completely when lock screen shows.
          Solid background, prominent layout. */
+            .desktop-window-backdrop {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: var(--taskbar-h) !important;
+        width: 100vw !important;
+        height: auto !important;
+        background: rgba(6, 8, 16, 0.65) !important;
+        backdrop-filter: blur(14px) !important;
+        -webkit-backdrop-filter: blur(14px) !important;
+      }
+
       #taskbar {
         position: fixed !important;
         bottom: 0 !important;
@@ -3462,6 +3516,8 @@
 
   <!-- 3D Three.js Background Canvas -->
   <canvas id="wallpaper-canvas"></canvas>
+    <!-- Desktop Window Acrylic Backdrop Blur Overlay -->
+    <div id="desktop-window-backdrop" class="desktop-window-backdrop" onclick="WindowManager.minimizeActive()"></div>
 
   <!-- Aurora Borealis Glow Spheres -->
   <div class="aurora-glow aurora-1"></div>
@@ -3557,9 +3613,9 @@
             <span>About Sushrut Mhetras</span>
           </div>
           <div class="window-controls">
-            <button class="win-btn btn-min" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
+            <button class="win-btn btn-min" onclick="WindowManager.minimize('win-about')" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
             <button class="win-btn btn-max" title="Maximize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-max"/></svg></button>
-            <button class="win-btn btn-close" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
+            <button class="win-btn btn-close" onclick="WindowManager.close('win-about')" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
           </div>
         </div>
 
@@ -3649,9 +3705,9 @@
             <span>Work Experience — WebTech Developers Pvt Ltd.</span>
           </div>
           <div class="window-controls">
-            <button class="win-btn btn-min" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
+            <button class="win-btn btn-min" onclick="WindowManager.minimize('win-experience')" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
             <button class="win-btn btn-max" title="Maximize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-max"/></svg></button>
-            <button class="win-btn btn-close" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
+            <button class="win-btn btn-close" onclick="WindowManager.close('win-experience')" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
           </div>
         </div>
 
@@ -3852,9 +3908,9 @@
             <span>Featured Software Projects</span>
           </div>
           <div class="window-controls">
-            <button class="win-btn btn-min" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
+            <button class="win-btn btn-min" onclick="WindowManager.minimize('win-projects')" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
             <button class="win-btn btn-max" title="Maximize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-max"/></svg></button>
-            <button class="win-btn btn-close" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
+            <button class="win-btn btn-close" onclick="WindowManager.close('win-projects')" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
           </div>
         </div>
 
@@ -3953,9 +4009,9 @@
             <span>Technical Skills &amp; Architecture</span>
           </div>
           <div class="window-controls">
-            <button class="win-btn btn-min" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
+            <button class="win-btn btn-min" onclick="WindowManager.minimize('win-skills')" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
             <button class="win-btn btn-max" title="Maximize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-max"/></svg></button>
-            <button class="win-btn btn-close" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
+            <button class="win-btn btn-close" onclick="WindowManager.close('win-skills')" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
           </div>
         </div>
 
@@ -4213,9 +4269,9 @@
             <span>Academic Background</span>
           </div>
           <div class="window-controls">
-            <button class="win-btn btn-min" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
+            <button class="win-btn btn-min" onclick="WindowManager.minimize('win-education')" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
             <button class="win-btn btn-max" title="Maximize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-max"/></svg></button>
-            <button class="win-btn btn-close" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
+            <button class="win-btn btn-close" onclick="WindowManager.close('win-education')" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
           </div>
         </div>
 
@@ -4292,9 +4348,9 @@
             <span>Certifications &amp; Honors</span>
           </div>
           <div class="window-controls">
-            <button class="win-btn btn-min" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
+            <button class="win-btn btn-min" onclick="WindowManager.minimize('win-certifications')" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
             <button class="win-btn btn-max" title="Maximize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-max"/></svg></button>
-            <button class="win-btn btn-close" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
+            <button class="win-btn btn-close" onclick="WindowManager.close('win-certifications')" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
           </div>
         </div>
 
@@ -4438,9 +4494,9 @@
             <span>Connect &amp; Message</span>
           </div>
           <div class="window-controls">
-            <button class="win-btn btn-min" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
+            <button class="win-btn btn-min" onclick="WindowManager.minimize('win-contact')" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
             <button class="win-btn btn-max" title="Maximize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-max"/></svg></button>
-            <button class="win-btn btn-close" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
+            <button class="win-btn btn-close" onclick="WindowManager.close('win-contact')" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
           </div>
         </div>
 
@@ -4538,9 +4594,9 @@
             <span>Windows PowerShell — Sushrut Developer Terminal</span>
           </div>
           <div class="window-controls">
-            <button class="win-btn btn-min" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
+            <button class="win-btn btn-min" onclick="WindowManager.minimize('win-terminal')" title="Minimize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-min"/></svg></button>
             <button class="win-btn btn-max" title="Maximize"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-max"/></svg></button>
-            <button class="win-btn btn-close" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
+            <button class="win-btn btn-close" onclick="WindowManager.close('win-terminal')" title="Close"><svg width="10" height="10" viewBox="0 0 10 10"><use href="#win-ctrl-close"/></svg></button>
           </div>
         </div>
 
@@ -5081,7 +5137,15 @@
             this.setupDraggable(winEl, titlebar);
           }
 
-          // Window control buttons (with both click and touch support)
+          // Stop propagation on window controls so titlebar drag never hijacks button taps
+          const winControls = winEl.querySelector('.window-controls');
+          if (winControls) {
+            winControls.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+            winControls.addEventListener('touchmove', (e) => e.stopPropagation(), { passive: true });
+            winControls.addEventListener('touchend', (e) => e.stopPropagation(), { passive: true });
+            winControls.addEventListener('mousedown', (e) => e.stopPropagation());
+          }
+
           const btnMin = winEl.querySelector('.btn-min');
           const btnMax = winEl.querySelector('.btn-max');
           const btnClose = winEl.querySelector('.btn-close');
@@ -5091,7 +5155,7 @@
               e.preventDefault();
               e.stopPropagation();
             }
-            this.minimize(id);
+            WindowManager.minimize(id);
           };
 
           const doClose = (e) => {
@@ -5099,7 +5163,7 @@
               e.preventDefault();
               e.stopPropagation();
             }
-            this.close(id);
+            WindowManager.close(id);
           };
 
           if (btnMin) {
@@ -5107,7 +5171,7 @@
             btnMin.addEventListener('touchend', doMin);
           }
           if (btnMax) {
-            btnMax.addEventListener('click', (e) => { e.stopPropagation(); this.toggleMaximize(id); });
+            btnMax.addEventListener('click', (e) => { e.stopPropagation(); WindowManager.toggleMaximize(id); });
           }
           if (btnClose) {
             btnClose.addEventListener('click', doClose);
@@ -5180,16 +5244,17 @@
         win.el.classList.remove('minimized');
         win.el.classList.add('open');
 
-        // On mobile, let fixed full-screen CSS manage placement cleanly
+        // On mobile, set explicit viewport height so content scrolls reliably
         if (window.innerWidth <= 768) {
           win.el.style.top = '0px';
           win.el.style.left = '0px';
           win.el.style.width = '100vw';
-          win.el.style.height = 'auto';
+          win.el.style.height = 'calc(100vh - 56px)';
         }
 
         this.focus(id);
         this.updateTaskbarState(id);
+        this.updateBackdropBlur();
       },
 
       close(id) {
@@ -5199,6 +5264,7 @@
         win.el.classList.remove('open', 'active');
         if (this.activeWindow === id) this.activeWindow = null;
         this.updateTaskbarState(id);
+        this.updateBackdropBlur();
       },
 
       minimize(id) {
@@ -5213,6 +5279,7 @@
           this.activeWindow = null;
         }
         this.updateTaskbarState(id);
+        this.updateBackdropBlur();
       },
 
       restore(id) {
@@ -5223,6 +5290,7 @@
         win.el.classList.remove('minimized');
         this.focus(id);
         this.updateTaskbarState(id);
+        this.updateBackdropBlur();
       },
 
       toggleMaximize(id) {
@@ -5290,7 +5358,7 @@
         // Desktop mouse dragging
         const onMouseDown = (e) => {
           if (winEl.classList.contains('maximized')) return;
-          if (e.target.closest('.win-btn')) return;
+          if (e.target.closest('.win-btn') || e.target.closest('.window-controls')) return;
 
           isDragging = true;
           startX = e.clientX;
@@ -5339,7 +5407,7 @@
         let swipeDistanceY = 0;
 
         const onTouchStart = (e) => {
-          if (e.target.closest('.win-btn')) return;
+          if (e.target.closest('.win-btn') || e.target.closest('.window-controls')) return;
           if (e.touches && e.touches.length === 1) {
             touchStartY = e.touches[0].clientY;
             touchStartX = e.touches[0].clientX;
@@ -5349,7 +5417,7 @@
         };
 
         const onTouchMove = (e) => {
-          if (e.target.closest('.win-btn')) return;
+          if (e.target.closest('.win-btn') || e.target.closest('.window-controls')) return;
           if (e.touches && e.touches.length === 1) {
             const curY = e.touches[0].clientY;
             const curX = e.touches[0].clientX;
